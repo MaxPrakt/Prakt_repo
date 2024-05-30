@@ -18,11 +18,18 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
-    @Override
-    public List<Task> findAllTasks() {
+//    @Override
+//    public List<Task> findAllTasks() {
+//
+//        return taskRepository.findAll();
+//    }
 
-        return taskRepository.findAll();
+    @Override
+    public List<Task> findTasksByAuthorId(Long authorId){
+
+        return taskRepository.findByAuthorId(authorId);
     }
+
     @Override
     public Task postTask(Task task) {
         return taskRepository.save(task);
