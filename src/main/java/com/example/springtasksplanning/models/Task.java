@@ -18,10 +18,20 @@ public class Task {
     @GeneratedValue
     private Long id;
     private String author;
-    private Long authorId;
     private String theme;
     private LocalDate creationDate;
     private LocalDate endDate;
     private String description;
+
+
+    @ManyToOne
+    @JoinColumn(name = "author_id") // Name of the foreign key column in the tasks table
+    private MyUser user;
+
+    //@Column(name = "author_id", insertable = false, updatable = false)
+    //private Long authorId;
+
+
+
 
 }
