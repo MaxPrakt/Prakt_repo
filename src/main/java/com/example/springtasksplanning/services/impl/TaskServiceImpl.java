@@ -1,19 +1,21 @@
 package com.example.springtasksplanning.services.impl;
 
-import com.example.springtasksplanning.models.MyUser;
 import com.example.springtasksplanning.models.Task;
 
+import com.example.springtasksplanning.dto.TaskDTO;
 import com.example.springtasksplanning.services.TaskService;
 import com.example.springtasksplanning.repository.TaskRepository;
 import com.example.springtasksplanning.services.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.springtasksplanning.exceptions.AccessDeniedException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -23,44 +25,74 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
-//    @Override
-//    public List<Task> findAllTasks() {
-//
-//        return taskRepository.findAll();
-//    }
 
     @Override
-    public List<Task> findTasksByAuthorId(Long authorId){
-
-        return taskRepository.findByUserId(authorId);
-    }
-
-    @Override
-    public Task postTask(Task task) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            Long userId = userService.getUserId(authentication);
-
-            // Set the user to the task
-            MyUser user = new MyUser();
-            user.setId(userId);
-            task.setUser(user);
-
-            // Save the task
-            return taskRepository.save(task);
-        } else {
-            throw new RuntimeException("User is not authenticated");
+    public List<TaskDTO> findTasksByAuthorId(Long authorId){
+        List<Task> foundTasks = taskRepository.findByUserId(authorId);
+        List<TaskDTO> tasksDTO = new ArrayList<>();
+        for (Task task : foundTasks) {
+            TaskDTO taskDTO = convertingTaskToDTO(task);
+            tasksDTO.add(taskDTO);
         }
+        return tasksDTO;
+
+    }
+
+    @Override
+
+    public List<TaskDTO> findAllTasks() {
+        List<Task> foundTasks = taskRepository.findAll();
+        List<TaskDTO> tasksDTO = new ArrayList<>();
+        for (Task task : foundTasks) {
+            TaskDTO taskDTO = convertingTaskToDTO(task);
+            tasksDTO.add(taskDTO);
+        }
+        return tasksDTO;
+    }
+
+    @Override
+    public TaskDTO postTask(Task task) {
+
+        Task savedTask= taskRepository.save(task);
+
+        return convertingTaskToDTO(savedTask);
 
     }
     @Override
-    public Task updateTask(Task task) {
-        return taskRepository.save(task);
+    public TaskDTO updateTask(Task task, Authentication authentication) {
+        Long userId = userService.getUserId(authentication);
+        if(Objects.equals(task.getUser().getId(), userId)
+                || Objects.equals(userService.getUserById(userId).getRoles(), "ADMIN")){
+
+            Task savedTask= taskRepository.save(task);
+            return convertingTaskToDTO(savedTask);
+        }
+        else
+
+            throw new AccessDeniedException();
     }
     @Override
     @Transactional
-    public void deleteTask(long id)
-    {
-        taskRepository.deleteById(id);
+    public String deleteTask(long id, Authentication authentication) {
+        Long userId = userService.getUserId(authentication);
+        if(Objects.equals((taskRepository.findTaskById(id)).getUser().getId(), userId)
+                || Objects.equals(userService.getUserById(userId).getRoles(), "ADMIN")) {
+            taskRepository.deleteTaskById(id);
+
+            return "task deleted";
+        }
+        else throw new AccessDeniedException();
+    }
+
+    public TaskDTO convertingTaskToDTO(Task task) {
+        TaskDTO savedTaskDTO = new TaskDTO();
+        savedTaskDTO.setId(task.getId());
+        savedTaskDTO.setAuthor(task.getAuthor());
+        savedTaskDTO.setTheme(task.getTheme());
+        savedTaskDTO.setCreationDate(task.getCreationDate());
+        savedTaskDTO.setEndDate(task.getEndDate());
+        savedTaskDTO.setDescription(task.getDescription());
+        return savedTaskDTO;
+
     }
 }

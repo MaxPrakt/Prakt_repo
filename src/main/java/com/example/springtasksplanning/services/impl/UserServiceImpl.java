@@ -26,7 +26,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getUserId(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        // Assuming your UserDetails contains user ID as a Long field
         return ((MyUserDetails) userDetails).getUserId();
     }
     @Override

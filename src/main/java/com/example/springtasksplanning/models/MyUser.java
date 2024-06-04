@@ -1,14 +1,16 @@
 package com.example.springtasksplanning.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Data
-
 @Entity
 @Table(name = "users")
 public class MyUser {
@@ -18,6 +20,9 @@ public class MyUser {
 
     private String userName;
     private String password;
-    @OneToMany(mappedBy = "user")
+    private String roles;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Task> tasks;
+
 }

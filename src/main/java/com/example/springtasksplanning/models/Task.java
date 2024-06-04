@@ -2,14 +2,17 @@ package com.example.springtasksplanning.models;
 
 import jakarta.persistence.*;
 
-import lombok.Data;
+import lombok.*;
 
 
 import java.time.LocalDate;
 
 
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table (name ="tasks")
 public class Task {
@@ -17,6 +20,7 @@ public class Task {
     @Id
     @GeneratedValue
     private Long id;
+
     private String author;
     private String theme;
     private LocalDate creationDate;
@@ -24,12 +28,11 @@ public class Task {
     private String description;
 
 
-    @ManyToOne
-    @JoinColumn(name = "author_id") // Name of the foreign key column in the tasks table
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // Name of the foreign key column in the tasks table
     private MyUser user;
 
     //@Column(name = "author_id", insertable = false, updatable = false)
-    //private Long authorId;
 
 
 
