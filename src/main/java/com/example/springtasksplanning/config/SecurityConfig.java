@@ -33,7 +33,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Bean
@@ -47,7 +47,7 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth.requestMatchers("api/v1/users/new-user").permitAll()
-                        .requestMatchers("api/v1/tasks/**").authenticated())
+                        .requestMatchers("api/v1/tasks/**", "/**").authenticated())
 
 
                 .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)

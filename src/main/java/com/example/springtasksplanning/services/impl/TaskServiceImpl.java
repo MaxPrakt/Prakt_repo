@@ -6,6 +6,7 @@ import com.example.springtasksplanning.dto.TaskDTO;
 import com.example.springtasksplanning.services.TaskService;
 import com.example.springtasksplanning.repository.TaskRepository;
 import com.example.springtasksplanning.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 //import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -61,9 +62,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDTO updateTask(Task task, Authentication authentication) {
         Long userId = userService.getUserId(authentication);
-        if(Objects.equals(task.getUser().getId(), userId)
+        Task existingTask= taskRepository.findById(task.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+        if(Objects.equals(existingTask.getUser().getId(), userId)
                 || Objects.equals(userService.getUserById(userId).getRoles(), "ADMIN")){
-
+            task.setUser(existingTask.getUser());
             Task savedTask= taskRepository.save(task);
             return convertingTaskToDTO(savedTask);
         }
@@ -71,17 +74,25 @@ public class TaskServiceImpl implements TaskService {
 
             throw new AccessDeniedException();
     }
+
+
+
     @Override
     @Transactional
     public String deleteTask(long id, Authentication authentication) {
         Long userId = userService.getUserId(authentication);
-        if(Objects.equals((taskRepository.findTaskById(id)).getUser().getId(), userId)
+        if (Objects.equals((taskRepository.findTaskById(id)).getUser().getId(), userId)
                 || Objects.equals(userService.getUserById(userId).getRoles(), "ADMIN")) {
             taskRepository.deleteTaskById(id);
 
             return "task deleted";
-        }
-        else throw new AccessDeniedException();
+        } else
+            throw new AccessDeniedException();
+    }
+
+    @Override
+    public TaskDTO getTaskById(Long id) {
+        return convertingTaskToDTO(taskRepository.findTaskById(id));
     }
 
     public TaskDTO convertingTaskToDTO(Task task) {

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Additional CSS for better aesthetics */
+        body {
+            padding-top: 20px;
+        }
+
+        .container {
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            vertical-align: middle !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Tasks</h1>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Author</th>
+            <th>Theme</th>
+            <th>Creation Date</th>
+            <th>End Date</th>
+            <th>Description</th>
+            <th>Actions</th> <!-- New column for actions -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Loop through tasks and display each task -->
+        <tr th:each="task : ${tasks}">
+            <td th:text="${task.id}"></td>
+            <td th:text="${task.author}"></td>
+            <td th:text="${task.theme}"></td>
+            <td th:text="${task.creationDate}"></td>
+            <td th:text="${task.endDate}"></td>
+            <td th:text="${task.description}"></td>
+            <td>
+                <!-- Buttons for delete and edit actions -->
+                <a th:href="@{/delete-task/{id}(id=${task.getId()})}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+</html>

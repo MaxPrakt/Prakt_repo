@@ -13,5 +13,8 @@ public interface TaskService {
     List<TaskDTO> findAllTasks();
     TaskDTO postTask(Task task);
     TaskDTO updateTask(Task task, Authentication authentication);
+    TaskDTO getTaskById(Long id);
     String deleteTask(long id, Authentication authentication);
+
+
 }
