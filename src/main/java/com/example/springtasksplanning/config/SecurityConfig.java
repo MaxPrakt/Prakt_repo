@@ -25,6 +25,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig {
+public class SecurityConfig{
 
     @Bean
 
@@ -46,11 +47,19 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth.requestMatchers("api/v1/users/new-user").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("api/v1/users/new-user", "registration", "login", "new-user").permitAll()
                         .requestMatchers("api/v1/tasks/**", "/**").authenticated())
 
 
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+                //.formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+        .formLogin(authz -> authz
+                .loginPage("/login").permitAll())
+
+        .logout(authz -> authz
+                .deleteCookies("JSESSIONID")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")))
+
+
 
                 .build();
     }

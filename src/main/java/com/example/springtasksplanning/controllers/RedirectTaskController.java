@@ -27,49 +27,55 @@ public class RedirectTaskController {
     @GetMapping("/")
 
     public String findTasksByAuthor(Model model, Authentication authentication) {
+        if(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))){
 
-        Long userId = userService.getUserId(authentication);
+            List<TaskDTO> tasks = taskService.findAllTasks();
 
-        List<TaskDTO> tasks= taskService.findTasksByAuthorId(userId);
+            model.addAttribute("tasks", tasks);
 
-        model.addAttribute("tasks", tasks);
+
+        }
+        else if(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("USER"))){
+            Long userId = userService.getUserId(authentication);
+
+            List<TaskDTO> tasks = taskService.findTasksByAuthorId(userId);
+
+            model.addAttribute("tasks", tasks);
+
+
+        }
         return "tasks";
     }
-
-    @GetMapping("all")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public List<TaskDTO> findAllTasks() {
-        return  taskService.findAllTasks();
-    }
-    @GetMapping("new-task")
-    public String newTask(Model model, Authentication authentication) {
+    @GetMapping("/new-task")
+    public String newTask(Model model) {
         Task task = new Task();
-        model.addAttribute("taskDTO", task);
+        model.addAttribute("task", task);
         return "new-task";
 
 
     }
 
-    @PostMapping("save-task")
+    @PostMapping("/save-task")
 
-    public String postTask(@RequestBody Task task, Authentication authentication){
+    public String postTask(Task task, Authentication authentication){
 
         Long userId = userService.getUserId(authentication);
         task.setUser(userService.getUserById(userId));
+        taskService.postTask(task);
 
         return "redirect:/";
 
     }
-    @PutMapping("update-task/{id}")
+    @GetMapping("/update-task/{id}")
 
-    public String updateTask(@RequestBody Long id, Model model){
+    public String updateTask(@PathVariable(value = "id") Long id, Model model){
         TaskDTO task =  taskService.getTaskById(id);
         model.addAttribute("task", task);
         return "update-task";
     }
-    @GetMapping("delete-task/{id}")
+    @GetMapping("/delete-task/{id}")
 
-    public String deleteTask(@PathVariable Long id, Authentication authentication){
+    public String deleteTask(@PathVariable(value = "id") Long id, Authentication authentication){
 
         taskService.deleteTask(id, authentication);
         return "redirect:/";

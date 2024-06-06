@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <!-- success message -->
+            <div th:if="${param.success}">
+                <div class="alert alert-info">You've successfully registered
+                    to our awesome app!</div>
+            </div>
+
+            <h1>Registration</h1>
+
+            <form action="#" th:action="@{/new-user}" method="post" th:object="${user}">
+                <div class="form-group">
+                    <label class="control-label" for="userName"> Username </label>
+                    <input id="userName" class="form-control" th:field="*{userName}"
+                           required autofocus="autofocus" />
+                </div>
+
+
+
+                <div class="form-group">
+                    <label class="control-label"> Roles </label>
+                    <div class="form-check">
+                        <input type="radio" id="USER" class="form-check-input" th:field="*{roles}" th:value="USER">
+                        <label for="USER" class="form-check-label">User</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="ADMIN" class="form-check-input" th:field="*{roles}" th:value="ADMIN">
+                        <label for="ADMIN" class="form-check-label">Admin</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="password"> Password </label> <input
+                        id="password" class="form-control" type="password"
+                        th:field="*{password}" required autofocus="autofocus" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Register</button>
+                    <span>Already registered? <a href="/" th:href="@{/login}">Login
+								here</a></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

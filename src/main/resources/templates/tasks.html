@@ -22,6 +22,7 @@
 <body>
 <div class="container">
     <h1>Tasks</h1>
+    <a th:href = "@{/new-task}" class="btn btn-primary btn-sm mb-3"> New task </a>
     <table class="table table-bordered table-striped">
         <thead class="thead-dark">
         <tr>
@@ -46,6 +47,7 @@
             <td>
                 <!-- Buttons for delete and edit actions -->
                 <a th:href="@{/delete-task/{id}(id=${task.getId()})}" class="btn btn-danger">Delete</a>
+                <a th:href="@{/update-task/{id}(id=${task.getId()})}" class="btn btn-primary">Update</a>
             </td>
         </tr>
         </tbody>
