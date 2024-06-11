@@ -28,13 +28,13 @@
         </div>
         <div class="form-group">
             <label for="creationDate">Creation Date:</label>
-            <input type="date" id="creationDate"  th:value="*{creationDate}" class="form-control">
-            <div id="creationDateCurrent-error" class="text-danger"></div>
+            <input type="date" id="creationDate"  th:value="*{creationDate}" class="form-control" readonly>
+
         </div>
         <div class="form-group">
             <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" th:value="*{endDate}" class="form-control">
-            <div id="endDateWithinOneMonth-error" class="text-danger"></div>
+            <input type="date" id="endDate" th:value="*{endDate}" class="form-control" readonly>
+
         </div>
         <div class="form-group">
             <label for="description">Description:</label>
@@ -73,7 +73,7 @@
                 data: JSON.stringify(formData),
                 contentType: "application/json",
                 success: function (response) {
-                    $("#taskForm")[0].reset();
+
                     alert("Updation successful!");
                 },
                 error: function (xhr) {

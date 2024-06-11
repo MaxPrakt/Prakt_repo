@@ -2,6 +2,7 @@
 package com.example.springtasksplanning.controllers;
 
 
+import com.example.springtasksplanning.dto.TaskUpdateDTO;
 import com.example.springtasksplanning.models.Task;
 import com.example.springtasksplanning.dto.TaskDTO;
 import com.example.springtasksplanning.services.TaskService;
@@ -51,7 +52,7 @@ public class TaskController{
     }
     @PutMapping("update-task")
 
-    public TaskDTO updateTask(@RequestBody @Valid TaskDTO task, Authentication authentication){
+    public TaskUpdateDTO updateTask(@RequestBody @Valid TaskUpdateDTO task, Authentication authentication){
 
         return taskService.updateTask(task, authentication);
     }
