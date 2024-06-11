@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Registration</title>
@@ -21,15 +21,13 @@
 
             <h1>Registration</h1>
 
-            <form action="#" th:action="@{/new-user}" method="post" th:object="${user}">
+            <form id="registration-form" th:action="@{/api/v1/users/new-user}" method="post" th:object="${user}">
                 <div class="form-group">
                     <label class="control-label" for="userName"> Username </label>
                     <input id="userName" class="form-control" th:field="*{userName}"
                            required autofocus="autofocus" />
+                    <div id="userName-error" class="text-danger"> </div>
                 </div>
-
-
-
                 <div class="form-group">
                     <label class="control-label"> Roles </label>
                     <div class="form-check">
@@ -41,11 +39,16 @@
                         <label for="ADMIN" class="form-check-label">Admin</label>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label class="control-label" for="password"> Password </label> <input
-                        id="password" class="form-control" type="password"
+                    <label class="control-label" for="birthDate">Birth Date</label>
+                    <input id="birthDate" class="form-control" type="date" th:value="*{birthDate}" th:field="*{birthDate}" required autofocus="autofocus"/>
+                    <div id="birthDate-error" class="text-danger"></div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="password"> Password </label>
+                    <input id="password" class="form-control" type="password"
                         th:field="*{password}" required autofocus="autofocus" />
+                    <div id="password-error" class="text-danger"></div>
                 </div>
 
                 <div class="form-group">
@@ -57,6 +60,45 @@
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#registration-form").submit(function (event) {
+            event.preventDefault();
+            var formData = {
+                 userName: $("#userName").val(),
+                 password: $("#password").val(),
+                 roles: $("input[name='roles']:checked").val(),
+                 birthDate: $("#birthDate").val(),
+             }; // Serialize form data
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/api/v1/users/new-user",
+                data: JSON.stringify(formData),
+                contentType: "application/json",
+                success: function (response) {
+                    $("#registration-form")[0].reset();
+                    alert("Registration successful!");
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+
+                        var errors = xhr.responseJSON;
+
+                        $.each(errors, function (field, message) {
+                            $("#" + field + "-error").text(message);
+                        });
+                    } else {
+
+                        alert("Failed to register. Please try again.");
+                    }
+                },
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

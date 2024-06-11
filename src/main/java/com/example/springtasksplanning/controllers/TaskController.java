@@ -6,10 +6,11 @@ import com.example.springtasksplanning.models.Task;
 import com.example.springtasksplanning.dto.TaskDTO;
 import com.example.springtasksplanning.services.TaskService;
 import com.example.springtasksplanning.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +28,10 @@ public class TaskController{
 
     @GetMapping
 
-    public List<TaskDTO> findTasksByAuthor(Model model, Authentication authentication) {
+    public List<TaskDTO> findTasksByAuthor(Authentication authentication) {
 
         Long userId = userService.getUserId(authentication);
 
-        //return  taskService.findTasksByAuthorId(userId);
 
         return taskService.findTasksByAuthorId(userId);
     }
@@ -44,17 +44,14 @@ public class TaskController{
 
     @PostMapping("save-task")
 
-    public TaskDTO postTask(@RequestBody Task task, Authentication authentication){
-
-        Long userId = userService.getUserId(authentication);
-        task.setUser(userService.getUserById(userId));
+    public TaskDTO postTask(@RequestBody @Valid TaskDTO task){
 
         return taskService.postTask(task);
 
     }
     @PutMapping("update-task")
 
-    public TaskDTO updateTask(@RequestBody Task task, Authentication authentication){
+    public TaskDTO updateTask(@RequestBody @Valid TaskDTO task, Authentication authentication){
 
         return taskService.updateTask(task, authentication);
     }

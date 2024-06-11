@@ -1,6 +1,6 @@
 package com.example.springtasksplanning.services.impl;
-
 import com.example.springtasksplanning.config.MyUserDetails;
+import com.example.springtasksplanning.dto.MyUserDTO;
 import com.example.springtasksplanning.models.MyUser;
 import com.example.springtasksplanning.repository.UserRepository;
 import com.example.springtasksplanning.services.UserService;
@@ -19,9 +19,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
 
-    public MyUser addUser(MyUser myUser) {
+    public MyUser addUser(MyUserDTO myUser) {
         myUser.setPassword(passwordEncoder.encode(myUser.getPassword()));
-        return userRepository.save(myUser);
+
+        return userRepository.save(fromDTOConverter(myUser));
     }
     @Override
     public Long getUserId(Authentication authentication) {
@@ -31,6 +32,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public MyUser getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
+    }
+
+    public MyUser fromDTOConverter(MyUserDTO userDTO)
+    {
+        MyUser myUser = new MyUser();
+        myUser.setId(userDTO.getId());
+        myUser.setUserName(userDTO.getUserName());
+        myUser.setPassword(userDTO.getPassword());
+        myUser.setRoles(userDTO.getRoles());
+        myUser.setBirthDate(userDTO.getBirthDate());
+        return myUser;
+
     }
 
 }

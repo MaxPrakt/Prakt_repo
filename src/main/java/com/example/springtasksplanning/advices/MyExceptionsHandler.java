@@ -2,7 +2,6 @@ package com.example.springtasksplanning.advices;
 
 import com.example.springtasksplanning.exceptions.AccessDeniedException;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

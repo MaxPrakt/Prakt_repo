@@ -1,19 +1,17 @@
 package com.example.springtasksplanning.services.impl;
 
 import com.example.springtasksplanning.models.Task;
-
 import com.example.springtasksplanning.dto.TaskDTO;
 import com.example.springtasksplanning.services.TaskService;
 import com.example.springtasksplanning.repository.TaskRepository;
 import com.example.springtasksplanning.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-//import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.springtasksplanning.exceptions.AccessDeniedException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,22 +50,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDTO postTask(Task task) {
-
-        Task savedTask= taskRepository.save(task);
-
-        return convertingTaskToDTO(savedTask);
+    public TaskDTO postTask(TaskDTO task) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Task savedTask= convertingTaskFromDTO(task);
+        Long userId = userService.getUserId(authentication);
+        savedTask.setUser(userService.getUserById(userId));
+        return convertingTaskToDTO(taskRepository.save(savedTask));
 
     }
     @Override
-    public TaskDTO updateTask(Task task, Authentication authentication) {
+    public TaskDTO updateTask(TaskDTO task, Authentication authentication) {
+        Task savedTask= convertingTaskFromDTO(task);
         Long userId = userService.getUserId(authentication);
         Task existingTask= taskRepository.findById(task.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
         if(Objects.equals(existingTask.getUser().getId(), userId)
                 || Objects.equals(userService.getUserById(userId).getRoles(), "ADMIN")){
-            task.setUser(existingTask.getUser());
-            Task savedTask= taskRepository.save(task);
+            savedTask.setUser(existingTask.getUser());
+            taskRepository.save(savedTask);
             return convertingTaskToDTO(savedTask);
         }
         else
@@ -93,7 +93,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDTO getTaskById(Long id) {
         return convertingTaskToDTO(taskRepository.findTaskById(id));
-        //return taskRepository.findTaskById(id);
+
     }
 
     public TaskDTO convertingTaskToDTO(Task task) {
@@ -106,5 +106,15 @@ public class TaskServiceImpl implements TaskService {
         savedTaskDTO.setDescription(task.getDescription());
         return savedTaskDTO;
 
+    }
+    public Task convertingTaskFromDTO(TaskDTO taskDTO) {
+        Task task = new Task();
+        task.setId(taskDTO.getId());
+        task.setAuthor(taskDTO.getAuthor());
+        task.setTheme(taskDTO.getTheme());
+        task.setCreationDate(taskDTO.getCreationDate());
+        task.setEndDate(taskDTO.getEndDate());
+        task.setDescription(taskDTO.getDescription());
+        return task;
     }
 }

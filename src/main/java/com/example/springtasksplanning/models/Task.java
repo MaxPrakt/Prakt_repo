@@ -1,13 +1,8 @@
 package com.example.springtasksplanning.models;
 
 import jakarta.persistence.*;
-
 import lombok.*;
-
-
 import java.time.LocalDate;
-
-
 
 @Getter
 @Setter
@@ -31,10 +26,5 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // Name of the foreign key column in the tasks table
     private MyUser user;
-
-    //@Column(name = "author_id", insertable = false, updatable = false)
-
-
-
 
 }

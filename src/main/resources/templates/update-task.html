@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Update task</title>
-
-<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container">
@@ -12,30 +11,35 @@
     <hr>
     <h2>Update Task</h2>
 
-    <form action="#" th:action="@{/save-task}" th:object="${task}" method="POST">
+    <form  id="taskForm" th:object="${task}" method="POST">
         <div class="form-group">
-            <label for="author">Id:</label>
+            <label for="id">Id:</label>
             <input type="text" id="id" th:field="*{id}" readonly>
         </div>
         <div class="form-group">
             <label for="author">Author:</label>
             <input type="text" id="author" th:field="*{author}" class="form-control" placeholder="Author">
+            <div id="author-error" class="text-danger"></div>
         </div>
         <div class="form-group">
             <label for="theme">Theme:</label>
             <input type="text" id="theme" th:field="*{theme}" class="form-control" placeholder="Theme">
+            <div id="theme-error" class="text-danger"></div>
         </div>
         <div class="form-group">
             <label for="creationDate">Creation Date:</label>
-            <input type="date" id="creationDate" th:field="*{creationDate}"  class="form-control">
+            <input type="date" id="creationDate"  th:value="*{creationDate}" class="form-control">
+            <div id="creationDateCurrent-error" class="text-danger"></div>
         </div>
         <div class="form-group">
             <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" th:field="*{endDate}" class="form-control">
+            <input type="date" id="endDate" th:value="*{endDate}" class="form-control">
+            <div id="endDateWithinOneMonth-error" class="text-danger"></div>
         </div>
         <div class="form-group">
             <label for="description">Description:</label>
             <textarea id="description" th:field="*{description}" class="form-control" rows="5" placeholder="Description"></textarea>
+            <div id="description-error" class="text-danger"></div>
         </div>
         <button type="submit" class="btn btn-info">Save Task</button>
     </form>
@@ -44,5 +48,50 @@
 
     <a th:href="@{/}">Back to Task List</a>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#taskForm').submit(function (event) {
+            event.preventDefault();
+            var formData = {
+                id:$("#id").val(),
+                author: $("#author").val(),
+                theme: $("#theme").val(),
+                creationDate: $("#creationDate").val(),
+                endDate: $("#endDate").val(),
+                description: $("#description").val(),
+
+            };
+
+            $(".text-danger").text("");
+
+            $.ajax({
+                type: "PUT",
+                url: "http://localhost:8080/api/v1/tasks/update-task",
+                data: JSON.stringify(formData),
+                contentType: "application/json",
+                success: function (response) {
+                    $("#taskForm")[0].reset();
+                    alert("Updation successful!");
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+
+                        var errors = xhr.responseJSON;
+
+                        $.each(errors, function (field, message) {
+                            $("#" + field + "-error").text(message);
+                        });
+                    } else {
+
+                        alert("Failed to update-task. Please try again.");
+                    }
+                },
+            });
+        });
+    });
+</script>
 </body>
 </html>
